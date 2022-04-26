@@ -7,7 +7,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
     res.setHeader(
       "Set-Cookie",
       cookie.serialize("themeMode", JSON.stringify(req.body.userTheme), {
-        httpOnly: true,
+        /* httpOnly: true, */
         secure: process.env.NODE_ENV !== "development",
         sameSite: "strict",
         path: "/",

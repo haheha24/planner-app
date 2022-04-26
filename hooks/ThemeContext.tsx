@@ -15,6 +15,7 @@ import { theme } from "../components/styles/Theme";
 
 /* Types */
 export type themeToggleCtxState = {
+  themeState: IUserTheme
   dispatch: Dispatch<IThemeActions>;
   toggleState: string;
   setToggleState: Dispatch<SetStateAction<string>>;
@@ -98,7 +99,7 @@ export const StyledThemeProvider = ({ children }: any) => {
   //return HOC provider
   return (
     <themeToggleContext.Provider
-      value={{ dispatch, toggleState, setToggleState }}
+      value={{ themeState, dispatch, toggleState, setToggleState }}
     >
       <ThemeProvider theme={themeState.theme}>
         <GlobalStyles />
