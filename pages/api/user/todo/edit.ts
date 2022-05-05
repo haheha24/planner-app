@@ -9,14 +9,18 @@ interface IReqBody {
   update: ITodoCardSchema;
 }
 
+/**
+ * Edits a user's specific card by the id being passed through req.body. Updates each user card field with through an update object.
+ * @returns the updated card.
+ */
 const editCard = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "PATCH") {
     const { cardId, update }: IReqBody = req.body;
-
     if (cardId && update) {
       try {
-        //helper function(s) to validate and sanitise user input
+        //Type cast ObjectId
         const objCardId = new mongoose.Types.ObjectId(cardId);
+        //Query update and return updated card
         const updateCardFields = await User.findOneAndUpdate(
           { "cards._id": objCardId },
           {
@@ -32,6 +36,7 @@ const editCard = async (req: NextApiRequest, res: NextApiResponse) => {
         ).then((user) => {
           return user.cards.id(cardId)
         });
+        //Send response
         res.status(200).send({ updated: true, card: updateCardFields });
       } catch (error) {
         res.status(500).send({ error: error });

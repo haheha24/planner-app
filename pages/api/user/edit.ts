@@ -16,11 +16,11 @@ interface IReqBody {
 const editUser = async (req: NextApiRequest, res: NextApiResponse) => {
   // Confirm method is PATCH request
   if ((req.method = "PATCH")) {
-    // Destructure, assign the id object and initialise update object
+    // Destructure
     const { userId, update }: IReqBody = req.body;
     if (typeof userId === "string" && update) {
-      // Ensure that the card field is empty and only call one query using userId
       try {
+        //Update query, returning new data
         const updateUserFields = await User.findOneAndUpdate(
           { _id: userId },
           update,
@@ -28,7 +28,7 @@ const editUser = async (req: NextApiRequest, res: NextApiResponse) => {
             new: true,
           }
         );
-        //Update query and send response
+        //Send response
         res.status(200).send({updated: true, user: updateUserFields});
       } catch (error) {
         res.status(500).send({ error: error });

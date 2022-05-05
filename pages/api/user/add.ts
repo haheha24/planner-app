@@ -9,6 +9,7 @@ import User, { IUser } from "../../../models/user";
 const addUser = async (req: NextApiRequest, res: NextApiResponse) => {
   // Confirm method is POST request, destructure and try saving new document
   if (req.method === "POST") {
+    //Destructure
     const { name, password, email } = req.body;
     if (name && password && email) {
       try {
@@ -18,8 +19,9 @@ const addUser = async (req: NextApiRequest, res: NextApiResponse) => {
           password: password,
           email: email,
         });
+        //Save new model to database
         const userCreated = await newUser.save();
-        //Add query and send back response
+        //Send response
         res.status(200).send({ added: true, user: userCreated });
       } catch (error) {
         res.status(500).send({ error: error });

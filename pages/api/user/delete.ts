@@ -8,14 +8,16 @@ import connectDB from "../../../middleware/connectDB";
 const deleteUser = async (req: NextApiRequest, res: NextApiResponse) => {
   // Confirm method is DELETE request, assign id object and try deleting document
   if (req.method === "DELETE") {
+    //Destructure
     const { id } = req.query;
     if (id) {
       try {
-        //Delete query and send back response
+        //Delete query
         const deleteUser = await User.findByIdAndDelete(id);
-        return res.status(200).send({ deleted: true, user: deleteUser });
+        //Send response
+        res.status(200).send({ deleted: true, user: deleteUser });
       } catch (error) {
-        return res.status(500).send({ error: error });
+        res.status(500).send({ error: error });
       }
     } else {
       res.status(422).send("Data incomplete");

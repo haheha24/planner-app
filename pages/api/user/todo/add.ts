@@ -10,6 +10,7 @@ import connectDB from "../../../../middleware/connectDB";
  */
 const addCard = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
+    //Destructure
     const { id, title, description, timeOfDay, dueDate, color } = req.body;
     if (id && title && description) {
       try {
@@ -21,12 +22,13 @@ const addCard = async (req: NextApiRequest, res: NextApiResponse) => {
           dueDate: dueDate || "",
           color: color || "#fff",
         });
+        //Query update to push
         const addCard = await User.findOneAndUpdate(
           { _id: id },
           { $push: { cards: newCard } },
           { new: true, lean: true }
         ).select({ cards: { $slice: -1 } });
-        //Add card query and send as response
+        //Send response
         res.status(200).send({ added: true, card: addCard });
       } catch (error) {
         res.status(500).send({ error: error });
