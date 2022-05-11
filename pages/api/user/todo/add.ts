@@ -1,4 +1,3 @@
-import { IUser } from "./../../../../models/user";
 import type { NextApiRequest, NextApiResponse } from "next";
 import User from "../../../../models/user";
 import TodoCard, { ITodoCardSchema } from "../../../../models/todoCard";
@@ -22,7 +21,7 @@ const addCard = async (req: NextApiRequest, res: NextApiResponse) => {
           dueDate: dueDate || "",
           color: color || "#fff",
         });
-        //Query update to push
+        //Query update to push and return newest card - last in the array
         const addCard = await User.findOneAndUpdate(
           { _id: id },
           { $push: { cards: newCard } },
