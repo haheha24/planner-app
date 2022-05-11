@@ -8,6 +8,7 @@ export interface ITodoCardSchema {
   timeOfDay: string;
   dueDate: string;
   color: string;
+  completed: boolean
 }
 
 /*      SCHEMA       */
@@ -23,6 +24,9 @@ export const CardSchema = new Schema<ITodoCardSchema>({
   color: {
     type: String,
   },
+  completed: {
+    type: Boolean,
+  }
 });
 const TodoCard = mongoose.model<ITodoCardSchema>("Todo", CardSchema);
 

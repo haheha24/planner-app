@@ -20,6 +20,7 @@ const addCard = async (req: NextApiRequest, res: NextApiResponse) => {
           timeOfDay: timeOfDay || "",
           dueDate: dueDate || "",
           color: color || "#fff",
+          completed: false,
         });
         //Query update to push and return newest card - last in the array
         const addCard = await User.findOneAndUpdate(

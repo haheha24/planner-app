@@ -30,6 +30,7 @@ const editCard = async (req: NextApiRequest, res: NextApiResponse) => {
               "cards.$.timeOfDay": update.timeOfDay || "",
               "cards.$.dueDate": update.dueDate || "",
               "cards.$.color": update.color || "#fff",
+              "cards.$.completed": update.completed || false
             },
           },
           { new: true }
