@@ -1,12 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import mongoose from "mongoose";
-import type { ITodoCardSchema } from "../../../../models/todoCard";
 import connectDB from "../../../../middleware/connectDB";
-import User from "../../../../models/user";
+import validate from "../../../../middleware/validate";
+import User, { ITodoCardSchema } from "../../../../models/user";
+import { editCardSchema } from "./../../../../schemas/validation";
+import { isValidObjectId, updateObject } from "./../../../../utility/helper";
 
 interface IReqBody {
-  cardId: string;
-  update: ITodoCardSchema;
+  id: string;
+  update: Partial<ITodoCardSchema>;
 }
 
 /**
@@ -15,39 +16,53 @@ interface IReqBody {
  */
 const editCard = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "PATCH") {
-    const { cardId, update }: IReqBody = req.body;
-    if (cardId && update) {
-      try {
-        //Type cast ObjectId
-        const objCardId = new mongoose.Types.ObjectId(cardId);
-        //Query update and return updated card
-        const updateCardFields = await User.findOneAndUpdate(
-          { "cards._id": objCardId },
-          {
-            $set: {
-              "cards.$.title": update.title || "",
-              "cards.$.description": update.description || "",
-              "cards.$.timeOfDay": update.timeOfDay || "",
-              "cards.$.dueDate": update.dueDate || "",
-              "cards.$.color": update.color || "#fff",
-              "cards.$.completed": update.completed || false
-            },
-          },
-          { new: true }
-        ).then((user) => {
-          return user.cards.id(cardId)
-        });
-        //Send response
-        res.status(200).send({ updated: true, card: updateCardFields });
-      } catch (error) {
-        res.status(500).send({ error: error });
+    const { id, update }: IReqBody = req.body;
+    try {
+      //validate that id is a valid mongodb ObjectId
+      if (isValidObjectId(id!) === false) {
+        return res.status(400).send("Not a valid ObjectId");
       }
-    } else {
-      res.status(422).send("Data incomplete");
+
+      //Query current card to be updated and destructure to extract without mongoose method properties
+      const currentCard = await User.findOne({ id }).then((user) => {
+        return user.cards.id(id);
+      });
+      const destructuredCard: {
+        [key: string]: string | boolean;
+      } & Partial<ITodoCardSchema> = {
+        title: currentCard.title,
+        description: currentCard.description,
+        timeOfDay: currentCard.timeOfDay,
+        dueDate: currentCard.dueDate,
+        color: currentCard.color,
+        completed: currentCard.completed,
+      };
+
+      for (let prop in destructuredCard) {
+        if (destructuredCard[prop] === undefined || null) {
+          delete destructuredCard[prop];
+        }
+      }
+
+      //Created an object with updated fields for the card
+      const newUpdatedObject = updateObject(update, destructuredCard);
+
+      //Query card again and update
+      const updateCardFields = await User.findOneAndUpdate(
+        { id },
+        { $set: newUpdatedObject }
+      ).then((user) => user.cards.id(id));
+
+      //Send response
+      return res.status(200).send({ updated: true, card: updateCardFields });
+    } catch (error) {
+      return res.status(500).send({ error: error });
     }
   } else {
-    res.status(422).send("Req method not supported");
+    return res
+      .status(405)
+      .send({ Allow: "PATCH", reponse: `${req.method} method not supported` });
   }
 };
 
-export default connectDB(editCard);
+export default validate(editCardSchema, connectDB(editCard));

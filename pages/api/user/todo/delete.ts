@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Types } from "mongoose";
+import { isValidObjectId } from "./../../../../utility/helper";
 import connectDB from "../../../../middleware/connectDB";
 import User from "../../../../models/user";
 
@@ -8,9 +9,16 @@ import User from "../../../../models/user";
  */
 const deleteCard = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "DELETE") {
-    //Destructure
-    const { id } = req.query;
-    if (typeof id === "string") {
+    //Narrow req.query.id typing to string as string[] under NextApiRequest is for [...id].ts pages
+    if (typeof req.query.id === "string") {
+      const id = req.query.id;
+
+      //validate that both ids are valid mongodb ObjectId
+      if (isValidObjectId(id) === false) {
+        return res.status(400).send("Not a valid ObjectId");
+      }
+
+      //Begin deleting user card
       try {
         //Type cast ObjectId
         const objCardId = new Types.ObjectId(id);
@@ -18,17 +26,19 @@ const deleteCard = async (req: NextApiRequest, res: NextApiResponse) => {
         const deleteCard = await User.findOneAndUpdate(
           { "cards._id": objCardId },
           { $pull: { cards: { _id: objCardId } } }
-        );
+        ).then((user) => user.cards);
         //Send response
-        res.status(200).send({ delete: true, user: deleteCard });
+        return res.status(200).send({ delete: true, user: deleteCard });
       } catch (error) {
-        res.status(500).send({ error: error });
+        return res.status(500).send({ error: error });
       }
     } else {
-      res.status(422).send("Data incomplete");
+      return res.status(400).send("Bad Request. Query not string");
     }
   } else {
-    res.status(422).send("Req method not supported");
+    return res
+      .status(405)
+      .send({ Allow: "DELETE", reponse: `${req.method} method not supported` });
   }
 };
 

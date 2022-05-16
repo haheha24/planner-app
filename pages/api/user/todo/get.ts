@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { isValidObjectId } from "./../../../../utility/helper";
 import connectDB from "../../../../middleware/connectDB";
 import User from "../../../../models/user";
 
@@ -7,24 +8,40 @@ import User from "../../../../models/user";
  */
 const getCard = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") {
-    //Destructure
-    const { userId, cardId } = req.query;
-    if (typeof userId === "string" && typeof cardId === "string") {
+    if (
+      typeof req.query.userId === "string" &&
+      typeof req.query.cardId === "string"
+    ) {
+      //Destructure
+      const { userId, cardId } = req.query;
+
+      //validate that both ids are valid mongodb ObjectId
+      if (
+        isValidObjectId(userId) === false ||
+        isValidObjectId(cardId) === false
+      ) {
+        return res.status(400).send("Not a valid ObjectId");
+      }
+
       try {
         //Query user and then card id
         const findCard = await User.findById(userId).then((user) =>
           user.cards.id(cardId)
         );
         //Send response
-        res.status(200).json(findCard);
+        return res.status(200).json(findCard);
       } catch (error) {
-        res.status(500).send({ error: error });
+        return res.status(500).send({ error: error });
       }
     } else {
-      res.status(422).send("Data incomplete");
+      return res
+        .status(400)
+        .send("Bad Request. One or both query is not a string");
     }
   } else {
-    res.status(422).send("Req method not supported");
+    return res
+      .status(405)
+      .send({ Allow: "GET", reponse: `${req.method} method not supported` });
   }
 };
 

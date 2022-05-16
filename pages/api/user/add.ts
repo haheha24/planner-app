@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import connectDB from "../../../middleware/connectDB";
+import validate from "../../../middleware/validate";
 import User, { IUser } from "../../../models/user";
+import { addUserSchema } from "../../../schemas/validation";
 
 /**
  * Req.body requires an name, password and email object that will be stored in the DB
@@ -11,27 +13,25 @@ const addUser = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     //Destructure
     const { name, password, email } = req.body;
-    if (name && password && email) {
-      try {
-        //Instantiate the User model with the req.body params
-        let newUser = new User<IUser>({
-          name: name,
-          password: password,
-          email: email,
-        });
-        //Save new model to database
-        const userCreated = await newUser.save();
-        //Send response
-        res.status(200).send({ added: true, user: userCreated });
-      } catch (error) {
-        res.status(500).send({ error: error });
-      }
-    } else {
-      res.status(422).send("Data incomplete");
+    try {
+      //Instantiate the User model with the req.body params
+      let newUser = new User<IUser>({
+        name: name,
+        password: password,
+        email: email,
+      });
+      //Save new model to database
+      const userCreated = await newUser.save();
+      //Send response
+      return res.status(201).send({ added: true, user: userCreated });
+    } catch (error) {
+      return res.status(500).send({ error: error });
     }
   } else {
-    res.status(422).send("Req method not supported");
+    return res
+      .status(405)
+      .send({ Allow: "POST", reponse: `${req.method} method not supported` });
   }
 };
 
-export default connectDB(addUser);
+export default validate(addUserSchema, connectDB(addUser));
