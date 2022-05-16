@@ -7,20 +7,17 @@ import mongoose from "mongoose";
  * @param handler callback function
  * @returns callback handler with req and res params passed.
  */
-const connectDB = (handler: NextApiHandler) => (
+const connectDB = (handler: NextApiHandler) => async (
   req: NextApiRequest,
   res: NextApiResponse
 ) => {
-/*   mongoose.connections.forEach((connection) =>
-    console.log(connection.readyState)
-  ); */
   if (mongoose.connections[0].readyState) {
     // Use current db connection
-    return handler(req, res);
+    return await handler(req, res);
   }
   // Use new db connection
   mongoose.connect(process.env.DB_URI!);
-  return handler(req, res);
+  return await handler(req, res);
 };
 
 export default connectDB;
