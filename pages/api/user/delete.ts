@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Types } from "mongoose";
-import { isValidObjectId } from "./../../../utility/helper";
+import { isValidObjectId } from "../../../utility/helpers";
 import User from "../../../models/user";
 import connectDB from "../../../middleware/connectDB";
 

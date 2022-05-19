@@ -3,7 +3,7 @@ import connectDB from "../../../../middleware/connectDB";
 import validate from "../../../../middleware/validate";
 import User, { ITodoCardSchema } from "../../../../models/user";
 import { editCardSchema } from "./../../../../schemas/validation";
-import { isValidObjectId, updateObject } from "./../../../../utility/helper";
+import { isValidObjectId, updateObject } from "../../../../utility/helpers";
 
 interface IReqBody {
   id: string;

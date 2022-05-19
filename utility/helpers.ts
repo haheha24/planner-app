@@ -2,9 +2,9 @@ import { Types } from "mongoose";
 
 /**************** Validate a potential MongoDB ObjectId **************************/
 /**
- * Uses mongoose validator for ObjectId but strings with a length of 12 pass
- * A string typecast to ObjectId is converted to a new ObjectId which would fail the following if statement
- * An ObjectId typecast as a new ObjectId will hold its current value, hence would return true, being equal and valid.
+ * Uses mongoose ObjectId validator but strings with a length of 12 pass.
+ * A string typecast to ObjectId is converted to a new ObjectId which would fail,
+ * as an ObjectId typecast to a new ObjectId will hold its current value, hence would return true, being equal and valid.
  * @param id An MongoDB ObjectId
  * @returns True if valid, false if not.
  */
@@ -31,21 +31,21 @@ export function isValidObjectId(id: string) {
  */
 export function updateObject<
   T extends object & Record<string, any>,
-  K extends T
+  K extends Partial<T>
 >(updateRequest: T, currentQuery: K) {
   //Initialise new object variable
-  let updatedObject = {} as { [K in keyof T]: string };
+  let updatedObject = {} as { [K in keyof T]: string | undefined };
 
   //Add new fields in
   for (let prop in updateRequest) {
-    if (currentQuery.hasOwnProperty(prop)) {
+    if (currentQuery.hasOwnProperty(prop) && prop !== undefined) {
       updatedObject[prop] = updateRequest[prop];
     }
   }
 
   //Add old fields that do not match new fields
   for (let prop in currentQuery) {
-    if (updateRequest.hasOwnProperty(prop) === false) {
+    if (updateRequest.hasOwnProperty(prop) === false  && prop !== undefined) {
       updatedObject[prop] = currentQuery[prop];
     }
   }
