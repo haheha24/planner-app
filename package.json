@@ -30,16 +30,24 @@
     "@types/react": "18.0.5",
     "@types/react-datepicker": "^4.4.1",
     "@types/react-dom": "18.0.1",
-    "@types/react-icons": "^3.0.0",
     "@types/styled-components": "^5.1.25",
     "@types/testing-library__jest-dom": "^5.14.3",
     "eslint": "8.13.0",
     "eslint-config-next": "12.1.5",
     "jest": "^28.1.0",
     "jest-environment-jsdom": "^28.1.0",
+    "msw": "^0.41.0",
     "typescript": "4.6.3"
+  },
+  "overrides": {
+    "msw": {
+      "@mswjs/interceptors": "0.16.0"
+    }
   },
   "resolutions": {
     "react-devtools-core": "4.14.0"
+  },
+  "msw": {
+    "workerDirectory": "public"
   }
 }
