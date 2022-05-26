@@ -9,7 +9,8 @@ type Props = {
 
 export const Container = styled.div`
   display: grid;
-  grid-template-rows: auto 70vh auto
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
 `;
 
 const Layout = ({ children }: Props) => {
