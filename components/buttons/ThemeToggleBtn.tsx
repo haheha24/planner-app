@@ -24,7 +24,7 @@ const ThemeToggleBtn = () => {
     }
   };
   return (
-    <Button onClick={(e) => handleThemeToggle(e)}>
+    <Button theme={{ fontSize: "2em" }} onClick={(e) => handleThemeToggle(e)}>
       <CgDarkMode style={{ verticalAlign: "middle" }} />
     </Button>
   );

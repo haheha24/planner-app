@@ -3,11 +3,12 @@ import styled from "styled-components";
 
 interface IProps extends React.DOMAttributes<HTMLButtonElement> {
   props?: React.MouseEventHandler<HTMLButtonElement>;
+  theme?: { [key: string]: string};
   children?: ReactNode;
-};
+}
 
 export const StyledButton = styled.button`
-  font-size: 2em;
+  font-size: ${(props) => props.theme.fontSize};
   padding: 0;
   margin: 0;
   background: none;
