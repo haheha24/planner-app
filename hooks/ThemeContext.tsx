@@ -8,14 +8,13 @@ import {
 } from "react";
 import type { Dispatch } from "react";
 import { ThemeProvider } from "styled-components";
-import { GlobalStyles } from "../components/styles/GlobalStyles";
 import { IconContext } from "react-icons";
 import iconTheme, { IIconTheme } from "../components/styles/IconTheme";
 import { theme } from "../components/styles/Theme";
 
 /* Types */
 export type themeToggleCtxState = {
-  themeState: IUserTheme
+  themeState: IUserTheme;
   dispatch: Dispatch<IThemeActions>;
   toggleState: string;
   setToggleState: Dispatch<SetStateAction<string>>;
@@ -33,7 +32,7 @@ export interface IUserTheme {
 }
 
 export interface IThemeActions {
-  type: string
+  type: string;
   payload: { theme: IThemeState; icontheme: IIconTheme };
 }
 
@@ -102,7 +101,6 @@ export const StyledThemeProvider = ({ children }: any) => {
       value={{ themeState, dispatch, toggleState, setToggleState }}
     >
       <ThemeProvider theme={themeState.theme}>
-        <GlobalStyles />
         <IconContext.Provider value={themeState.iconTheme}>
           {children}
         </IconContext.Provider>
