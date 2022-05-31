@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import connectDB from "../../../middleware/connectDB";
 import validate from "../../../middleware/validate";
 import User, { IUser } from "../../../models/user";
-import { addUserSchema } from "../../../schemas/validation";
+import { addUserSchema } from "../../../schemas/dbValidation";
 
 /**
  * Req.body requires an name, password and email object that will be stored in the DB

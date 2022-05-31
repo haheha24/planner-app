@@ -3,7 +3,7 @@ import { isValidObjectId } from "../../../utility/helpers";
 import connectDB from "../../../middleware/connectDB";
 import validate from "../../../middleware/validate";
 import User from "../../../models/user";
-import { editUserSchema } from "./../../../schemas/validation";
+import { editUserSchema } from "../../../schemas/dbValidation";
 
 interface IReqBody {
   id: string;

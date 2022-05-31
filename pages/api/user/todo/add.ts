@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import connectDB from "../../../../middleware/connectDB";
 import validate from "../../../../middleware/validate";
 import User from "../../../../models/user";
-import { addCardSchema } from "../../../../schemas/validation";
+import { addCardSchema } from "../../../../schemas/dbValidation";
 
 /**
  * POST method to req.body. Send id, title, description, timeOfDay, dueDate and color in request.

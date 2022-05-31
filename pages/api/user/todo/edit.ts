@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import connectDB from "../../../../middleware/connectDB";
 import validate from "../../../../middleware/validate";
 import User, { ITodoCardSchema } from "../../../../models/user";
-import { editCardSchema } from "./../../../../schemas/validation";
+import { editCardSchema } from "../../../../schemas/dbValidation";
 import { isValidObjectId, updateObject } from "../../../../utility/helpers";
 
 interface IReqBody {
