@@ -78,7 +78,7 @@ export const StyledThemeProvider = ({ children }: any) => {
 
   //API call to store state as a cookie
   useEffect(() => {
-    const setTheme = async (theme: IUserTheme) => {
+    const setCookieTheme = async (theme: IUserTheme) => {
       const res = await fetch("/api/theme/setTheme", {
         method: "post",
         headers: {
@@ -89,9 +89,9 @@ export const StyledThemeProvider = ({ children }: any) => {
       return res;
     };
     if (themeState._storedToggle === "light") {
-      setTheme(themeState);
-    } else {
-      setTheme(themeState);
+      setCookieTheme(themeState);
+    } else if (themeState._storedToggle === "dark") {
+      setCookieTheme(themeState);
     }
   }, [toggleState]);
 
@@ -112,4 +112,20 @@ export const StyledThemeProvider = ({ children }: any) => {
 //Consumer to be imported
 export const useToggleContext = () => {
   return useContext(themeToggleContext);
+};
+
+//Theme Updater
+export const useUpdateThemeOnce = (theme: IUserTheme) => {
+  const { dispatch, setToggleState } = useToggleContext();
+  useEffect(() => {
+    //update state if theme props exist - prevents updating with undefined
+    dispatch({
+      type: theme._storedToggle,
+      payload: {
+        theme: theme.theme,
+        icontheme: theme.iconTheme,
+      },
+    });
+    setToggleState(theme._storedToggle);
+  }, []);
 };

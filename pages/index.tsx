@@ -1,55 +1,43 @@
 import type { NextPage, GetServerSideProps } from "next";
-import { useState, useEffect } from "react";
-import Button from "../components/styles/Button.styled";
-import { useToggleContext } from "../hooks/ThemeContext";
+import { useSession } from "next-auth/react";
+import { useUpdateThemeOnce } from "../hooks/ThemeContext";
 import type { IUserTheme } from "../hooks/ThemeContext";
-import cookie from "cookie";
+import Layout from "../components/layout/Layout";
 
-interface IPageTheme {
-  themeCookie: { themeMode: string };
-}
+const Home: NextPage<{ themeMode: string }> = ({ themeMode }) => {
+  const { data: session } = useSession();
+  const parsedCookie: IUserTheme = JSON.parse(themeMode);
+  useUpdateThemeOnce(parsedCookie);
 
-const Home: NextPage<IPageTheme> = ({ themeCookie }) => {
-  const { dispatch, setToggleState } = useToggleContext();
+  //Logged in
+  if (session) {
+    const userName = session.user
+      ?.name!.split(" ")
+      .map((word) => {
+        return word[0].toUpperCase() + word.slice(1);
+      })
+      .join(" ");
+    return <Layout>{`Welcome ${userName}`}</Layout>;
+  }
 
-  useEffect(() => {
-    try {
-      const parsedCookie: IUserTheme = JSON.parse(themeCookie.themeMode);
-      //update state if theme props exist - prevents updating with undefined
-      if (parsedCookie.theme) {
-        dispatch({
-          type: parsedCookie._storedToggle,
-          payload: {
-            theme: parsedCookie.theme,
-            icontheme: parsedCookie.iconTheme,
-          },
-        });
-        setToggleState(parsedCookie._storedToggle);
-      }
-    } catch (error) {
-      if (error instanceof SyntaxError) {
-        console.error(
-          `${error}: Error may have occured due to first user visit and no theme has been stored as a cookie. Try refreshing or changing the theme`
-        );
-      } else {
-        console.error(error);
-      }
-    }
-  }, []);
-  const [state, setState] = useState(0);
-  return (
-    <>
-      <div>{state}</div>
-      <Button onClick={() => setState(state + 1)}>Increment</Button>
-      <Button onClick={() => setState(state - 1)}>Decrement</Button>
-    </>
-  );
+  //Sign in
+  return <Layout>To-Do-lander App</Layout>;
 };
 
 export default Home;
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const themeCookie = cookie.parse(ctx.req.headers.cookie || "");
-  //Wraps the cookie inside props:themeCookie. Must be unpacked in Home functional argument
-  return { props: { themeCookie } };
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const parsedCookie = req.cookies;
+  let { themeMode } = parsedCookie;
+
+  if (themeMode === undefined) {
+    themeMode = JSON.stringify({
+      theme: { text: "#000", body: "#fff" },
+      _storedToggle: "light",
+      iconTheme: { color: "#000", size: "1.25em" },
+    });
+    return { props: { themeMode } };
+  }
+
+  return { props: { themeMode } };
 };
