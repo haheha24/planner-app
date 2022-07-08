@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import connectDB from "../../../middleware/connectDB";
+import { connectDB, validate } from "../../../middleware";
+import { signInSchema } from "../../../schemas/dbValidation";
 import User from "../../../models/user";
 
 /**
@@ -35,4 +36,4 @@ const signInDB = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default connectDB(signInDB);
+export default validate(signInSchema, connectDB(signInDB));
