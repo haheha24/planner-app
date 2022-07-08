@@ -1,26 +1,31 @@
 import { object, string, bool, TypeOf } from "yup";
 
-export let addUserSchema = object().shape({
+export const signInSchema = object().shape({
+  email: string().optional().email(),
+  password: string().optional().min(8).max(16),
+});
+
+export const addUserSchema = object().shape({
   name: string().required().min(2).max(24),
   password: string().required().min(8).max(16),
   email: string().email(),
 });
 
-export let editUserSchema = object().shape({
+export const editUserSchema = object().shape({
   id: string().required(),
   name: string().optional().min(2).max(24),
   password: string().optional().min(8).max(16),
   email: string().optional().email(),
 });
 
-export let addCardSchema = object().shape({
+export const addCardSchema = object().shape({
   title: string().required(),
   description: string().required(),
   timeOfDay: string().optional().ensure(),
   dueDate: string().optional().ensure(),
   color: string().optional().ensure(),
 });
-export let editCardSchema = object().shape({
+export const editCardSchema = object().shape({
   id: string().required(),
   title: string(),
   description: string(),
@@ -34,6 +39,8 @@ export let editCardSchema = object().shape({
     .optional()
     .default(() => false),
 });
+
+export type SignInSchema = TypeOf<typeof signInSchema>;
 
 export type AddUserType = TypeOf<typeof addUserSchema>;
 export type EditUserType = TypeOf<typeof editUserSchema>;
