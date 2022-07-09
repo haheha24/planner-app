@@ -1,8 +1,11 @@
 import { object, string, bool, TypeOf } from "yup";
 
 export const signInSchema = object().shape({
-  email: string().optional().email(),
-  password: string().optional().min(8).max(16),
+  email: string().email("Invalid email address").required("Please enter your email"),
+  password: string()
+    .min(8, "Must be 8 characters or more")
+    .max(16, "Must be 16 characters or less")
+    .required("Please enter your password"),
 });
 
 export const addUserSchema = object().shape({

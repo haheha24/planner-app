@@ -1,4 +1,3 @@
-import type { NextApiRequest, NextApiResponse } from "next";
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -6,21 +5,33 @@ import CredentialsProvider from "next-auth/providers/credentials";
 export default NextAuth({
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      id: "credentials",
+      name: "credentials",
       credentials: {
-        email: { label: "Email", type: "text", placeholder: "username" },
-        password: { label: "Password", type: "password" },
+        email: { label: "email", type: "text" },
+        password: { label: "password", type: "password" },
       },
       async authorize(credentials) {
-        const res = await fetch("/api/login", {
+        const res = await fetch("http://localhost:3000/api/user/signInDB", {
           method: "POST",
-          body: JSON.stringify(credentials),
           headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: credentials?.email,
+            password: credentials?.password,
+          }),
         });
 
-        // If no error and we have user data, return it
-        const user = await res.json();
-        if (res.ok && user) {
+        const userRes = await res.json();
+
+        const user = {
+          _id: userRes.user._id,
+          name: userRes.user.name,
+          email: userRes.user.email,
+          cards: userRes.user.cards,
+        };
+
+        // if user found, return user. Actual user is wrapped inside an object and must be accessed.
+        if (res.ok && user !== null) {
           return user;
         }
         // Return null if user data could not be retrieved
@@ -41,17 +52,25 @@ export default NextAuth({
   ],
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, account }) {
-      if (account?.accessToken) {
-        token.accessToken = account.accessToken;
+    async jwt({ token, user }) {
+      if (user) {
+        token.cards = user.cards;
       }
       return token;
     },
-    async redirect({ baseUrl }) {
-      return baseUrl;
+    async session({ session, token }) {
+      session.user = token;
+      return session;
+    },
+    async redirect({ baseUrl, url }) {
+      return url.startsWith(baseUrl) ? baseUrl : url;
     },
   },
+  session: {
+    // Set to jwt in order for CredentialsProvider to work properly
+    strategy: "jwt",
+  },
   pages: {
-    signIn: "/auth/signin"
+    signIn: "/auth/signin",
   },
 });
