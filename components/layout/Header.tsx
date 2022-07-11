@@ -1,3 +1,4 @@
+import Link from "next/link";
 import styled from "styled-components";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { H1 } from "../styles/Heading.styled";
@@ -16,7 +17,11 @@ const Header = () => {
   if (session) {
     return (
       <StyledHeader>
-        <H1>To-Do-Landar</H1>
+        <H1>
+          <Link href="/">
+            <a>Planner App</a>
+          </Link>
+        </H1>
         <ThemeToggleBtn />
         {/* insert settings button here */}
         <Button onClick={() => signOut()}>Sign out</Button>
@@ -27,7 +32,11 @@ const Header = () => {
   //Sign in
   return (
     <StyledHeader>
-      <H1>To-Do-Landar</H1>
+      <H1>
+        <Link href="/">
+          <a>Planner App</a>
+        </Link>
+      </H1>
       <ThemeToggleBtn />
       {/* insert settings button here */}
       <Button onClick={() => signIn()}>Sign in</Button>

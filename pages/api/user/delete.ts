@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { Types } from "mongoose";
 import { isValidObjectId } from "../../../utility/helpers";
 import User from "../../../models/user";
-import connectDB from "../../../middleware/connectDB";
+import { mongoHandler } from "../../../middleware";
 
 /**
  * Method DELETE that uses mongoose.Model.findByIdAndDelete method, as well as req.body.id to identify the _id of the User to delete
@@ -23,20 +23,20 @@ const deleteUser = async (req: NextApiRequest, res: NextApiResponse) => {
         //Type cast ObjectId
         const objCardId = new Types.ObjectId(id);
         //Query by id and delete user
-        const deleteUser = await User.findByIdAndDelete(objCardId);
+        await User.findByIdAndDelete(objCardId);
         //Send response
-        return res.status(200).send({ deleted: true, user: deleteUser });
+        return res.status(200).send({ message: "Successfully deleted" });
       } catch (error) {
         return res.status(500).send({ error: error });
       }
     } else {
-      return res.status(400).send("Bad Request. Query not string");
+      return res.status(400).send({ error: "Bad Request. Query not string" });
     }
   } else {
     return res
       .status(405)
-      .send({ Allow: "DELETE", reponse: `${req.method} method not supported` });
+      .send({ Allow: "DELETE", error: `${req.method} method not supported` });
   }
 };
 
-export default connectDB(deleteUser);
+export default mongoHandler(deleteUser);

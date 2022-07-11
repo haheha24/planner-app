@@ -7,7 +7,7 @@ import mongoose from "mongoose";
  * @param handler callback function
  * @returns callback handler with req and res params passed.
  */
-const connectDB = (handler: NextApiHandler) => async (
+export const mongoHandler = (handler: NextApiHandler) => async (
   req: NextApiRequest,
   res: NextApiResponse
 ) => {
@@ -16,8 +16,15 @@ const connectDB = (handler: NextApiHandler) => async (
     return await handler(req, res);
   }
   // Use new db connection
-  mongoose.connect(process.env.DB_URI!);
+  mongoose.connect(process.env.MONGODB_URI!);
   return await handler(req, res);
 };
 
-export default connectDB;
+export const mongoConnect = () => {
+  if (mongoose.connections[0].readyState) {
+    // if connection is open return the instance of the databse for cleaner queries
+    return mongoose.connection.db;
+  }
+
+  return mongoose.connect(process.env.MONGODB_URI!);
+};

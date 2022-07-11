@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { isValidObjectId } from "../../../utility/helpers";
-import connectDB from "../../../middleware/connectDB";
-import validate from "../../../middleware/validate";
+import { mongoHandler, validate } from "../../../middleware";
 import User from "../../../models/user";
 import { editUserSchema } from "../../../schemas/dbValidation";
 
@@ -33,15 +32,15 @@ const editUser = async (req: NextApiRequest, res: NextApiResponse) => {
         }
       );
       //Send response
-      return res.status(200).send({ updated: true, user: updateUserFields });
+      return res.status(200).send({ message: "Successfuly updated" });
     } catch (error) {
       return res.status(500).send({ error: error });
     }
   } else {
     return res
       .status(405)
-      .send({ Allow: "PATCH", reponse: `${req.method} method not supported` });
+      .send({ Allow: "PATCH", error: `${req.method} method not supported` });
   }
 };
 
-export default validate(editUserSchema, connectDB(editUser));
+export default validate(editUserSchema, mongoHandler(editUser));

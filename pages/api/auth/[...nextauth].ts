@@ -1,6 +1,10 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
+import bcrypt from "bcrypt";
+import User from "../../../models/user";
+import clientPromise from "../../../utility/mongodb";
 
 export default NextAuth({
   providers: [
@@ -12,30 +16,40 @@ export default NextAuth({
         password: { label: "password", type: "password" },
       },
       async authorize(credentials) {
-        const res = await fetch("http://localhost:3000/api/user/signInDB", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: credentials?.email,
-            password: credentials?.password,
-          }),
-        });
+        try {
+          //lookup DB email
+          const getUser = await User.findOne(
+            {
+              email: credentials!.email,
+            },
+            "name email cards image password"
+          );
+          if (getUser == null || !getUser.password) {
+            return null;
+          }
 
-        const userRes = await res.json();
+          //Compare credential password to DB password
+          const comparePassword = await bcrypt.compare(
+            credentials!.password,
+            getUser.password
+          );
 
-        const user = {
-          _id: userRes.user._id,
-          name: userRes.user.name,
-          email: userRes.user.email,
-          cards: userRes.user.cards,
-        };
-
-        // if user found, return user. Actual user is wrapped inside an object and must be accessed.
-        if (res.ok && user !== null) {
-          return user;
+          // if password match, return user object with insensitive data.
+          if (comparePassword) {
+            const user = {
+              name: getUser.name,
+              email: getUser.email,
+              image: getUser.image || null,
+              cards: getUser.cards || [],
+            };
+            return user;
+          }
+          // Return null if user data could not be retrieved
+          return null;
+        } catch (error) {
+          console.log(error);
+          return null;
         }
-        // Return null if user data could not be retrieved
-        return null;
       },
     }),
     GoogleProvider({
@@ -50,6 +64,7 @@ export default NextAuth({
       },
     }),
   ],
+  adapter: MongoDBAdapter(clientPromise),
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async jwt({ token, user }) {
@@ -67,7 +82,6 @@ export default NextAuth({
     },
   },
   session: {
-    // Set to jwt in order for CredentialsProvider to work properly
     strategy: "jwt",
   },
   pages: {

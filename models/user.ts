@@ -14,6 +14,8 @@ export interface IUser {
   name: string;
   password: string;
   email: string;
+  image?: string | null;
+  emailVerified?: boolean | null;
   cards?: ITodoCardSchema[];
 }
 
@@ -46,6 +48,13 @@ export const userSchema = new Schema<IUser>({
   },
   email: {
     type: String,
+    required: true,
+  },
+  image: {
+    type: String,
+  },
+  emailVerified: {
+    type: Boolean,
     required: true,
   },
   cards: {

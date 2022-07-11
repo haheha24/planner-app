@@ -21,7 +21,7 @@ const Home: NextPage<{ themeMode: string }> = ({ themeMode }) => {
   }
 
   //Sign in
-  return <Layout>To-Do-lander App</Layout>;
+  return <Layout>Planner App</Layout>;
 };
 
 export default Home;

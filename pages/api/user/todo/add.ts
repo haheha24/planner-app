@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import connectDB from "../../../../middleware/connectDB";
-import validate from "../../../../middleware/validate";
+import { mongoHandler, validate } from "../../../../middleware";
 import User from "../../../../models/user";
 import { addCardSchema } from "../../../../schemas/dbValidation";
 
@@ -25,21 +24,25 @@ const addCard = async (req: NextApiRequest, res: NextApiResponse) => {
       //Query update to push and return newest card - last in the array
       const addCard = await User.findOneAndUpdate(
         { _id: id },
+        //@ts-ignore
         { $push: { cards: newCard } },
         { new: true }
       )
         .select({ cards: { $slice: -1 } })
+        //@ts-ignore
         .then((user) => user.cards[0]);
       //Send response
-      return res.status(201).send({ added: true, card: addCard });
+      return res
+        .status(201)
+        .send({ card: addCard, message: "Added card successfully" });
     } catch (error) {
       return res.status(500).send({ error: error });
     }
   } else {
     return res
       .status(405)
-      .send({ Allow: "POST", reponse: `${req.method} method not supported` });
+      .send({ Allow: "POST", error: `${req.method} method not supported` });
   }
 };
 
-export default validate(addCardSchema, connectDB(addCard));
+export default validate(addCardSchema, mongoHandler(addCard));

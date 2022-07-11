@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import connectDB from "../../../../middleware/connectDB";
-import validate from "../../../../middleware/validate";
+import bcrypt from "bcrypt";
+import { mongoHandler, validate } from "../../../../middleware";
 import User, { ITodoCardSchema } from "../../../../models/user";
 import { editCardSchema } from "../../../../schemas/dbValidation";
 import { isValidObjectId, updateObject } from "../../../../utility/helpers";
@@ -27,6 +27,11 @@ const editCard = async (req: NextApiRequest, res: NextApiResponse) => {
       const currentCard = await User.findOne({ id }).then((user) => {
         return user.cards.id(id);
       });
+
+      //salt to hash password
+      const salt = await bcrypt.genSalt(10);
+      currentCard.password = await bcrypt.hash(currentCard.password, salt);
+
       const destructuredCard: {
         [key: string]: string | boolean;
       } & Partial<ITodoCardSchema> = {
@@ -48,21 +53,21 @@ const editCard = async (req: NextApiRequest, res: NextApiResponse) => {
       const newUpdatedObject = updateObject(update, destructuredCard);
 
       //Query card again and update
-      const updateCardFields = await User.findOneAndUpdate(
+      await User.findOneAndUpdate(
         { id },
         { $set: newUpdatedObject }
-      ).then((user) => user.cards.id(id));
+      )/* .then((user) => user.cards.id(id)) */;
 
       //Send response
-      return res.status(200).send({ updated: true, card: updateCardFields });
+      return res.status(200).send({ message: "Updated successfully" });
     } catch (error) {
       return res.status(500).send({ error: error });
     }
   } else {
     return res
       .status(405)
-      .send({ Allow: "PATCH", reponse: `${req.method} method not supported` });
+      .send({ Allow: "PATCH", error: `${req.method} method not supported` });
   }
 };
 
-export default validate(editCardSchema, connectDB(editCard));
+export default validate(editCardSchema, mongoHandler(editCard));

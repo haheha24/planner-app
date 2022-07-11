@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import type { GetServerSideProps } from "next";
 import { getProviders, getCsrfToken, signIn } from "next-auth/react";
 import type { LiteralUnion, ClientSafeProvider } from "next-auth/react";
@@ -8,6 +9,9 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import { signInSchema } from "../../schemas/dbValidation";
 import { useUpdateThemeOnce } from "../../hooks/ThemeContext";
 import type { IUserTheme } from "../../hooks/ThemeContext";
+import { H2 } from "../../components/styles/Heading.styled";
+import Footer from "../../components/layout/Footer";
+import Header from "../../components/layout/Header";
 
 interface ISigninProps {
   providers: Record<
@@ -33,16 +37,18 @@ export default function SignIn({
   >(null);
 
   const initialValues = {
-    email: "adrian.cristallo@outlook.com",
-    password: "temppassword",
+    email: "",
+    password: "",
   };
 
   const otherProviders: ClientSafeProvider[] = Object.values(providers).filter(
-    (provider) => provider !== providers.email
+    (provider) => provider !== providers.credentials
   );
 
   return (
     <>
+      <Header />
+      <H2>Sign In</H2>
       <Formik
         initialValues={initialValues}
         validationSchema={signInSchema}
@@ -54,8 +60,8 @@ export default function SignIn({
             password: values.password,
             callbackUrl: `${window.location.origin}`,
           }).then((response) => {
-            if (response!.error) {
-              setCredentialsError(response?.error);
+            if (response!.error === "CredentialsSignin") {
+              setCredentialsError("The email or password is incorrect");
             } else {
               setCredentialsError(null);
             }
@@ -107,17 +113,23 @@ export default function SignIn({
             <button type="submit">
               {isSubmitting ? "Please wait.." : "Sign in with Email"}
             </button>
+            <button type="button">
+              <Link href="/signup">
+                <a>Sign Up</a>
+              </Link>
+            </button>
           </Form>
         )}
       </Formik>
-      <div>or</div>
-      {otherProviders.map((provider: any) => (
+      <p>or</p>
+      {otherProviders.map((provider) => (
         <div key={provider.name}>
           <button type="submit" onClick={async () => await signIn(provider.id)}>
             Sign in with {provider.name}
           </button>
         </div>
       ))}
+      <Footer />
     </>
   );
 }

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { isValidObjectId } from "../../../utility/helpers";
-import connectDB from "../../../middleware/connectDB";
+import { mongoHandler } from "../../../middleware";
 import User from "../../../models/user";
 
 /**
@@ -14,24 +14,28 @@ const getUser = async (req: NextApiRequest, res: NextApiResponse) => {
 
       //validate that both ids are valid mongodb ObjectId
       if (isValidObjectId(id) === false) {
-        return res.status(400).send("Not a valid ObjectId");
+        return res.status(400).send({ error: "Not a valid ObjectId" });
       }
       try {
         //Query id of user
         const getUser = await User.findById(id);
         //Send response
-        return res.status(200).send({ user: getUser });
+        return res
+          .status(200)
+          .send({ user: getUser, message: "User query successful" });
       } catch (error) {
         return res.status(500).send({ error: error });
       }
     } else {
-      return res.status(422).send("Bad Request. Query is not a string");
+      return res
+        .status(422)
+        .send({ error: "Bad Request. Query is not a string" });
     }
   } else {
     return res
       .status(405)
-      .send({ Allow: "GET", reponse: `${req.method} method not supported` });
+      .send({ Allow: "GET", error: `${req.method} method not supported` });
   }
 };
 
-export default connectDB(getUser);
+export default mongoHandler(getUser);

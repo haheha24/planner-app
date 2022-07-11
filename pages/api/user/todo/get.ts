@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { isValidObjectId } from "../../../../utility/helpers";
-import connectDB from "../../../../middleware/connectDB";
+import { mongoHandler } from "../../../../middleware";
 import User from "../../../../models/user";
 
 /**
@@ -29,20 +29,22 @@ const getCard = async (req: NextApiRequest, res: NextApiResponse) => {
           user.cards.id(cardId)
         );
         //Send response
-        return res.status(200).json(findCard);
+        return res
+          .status(200)
+          .json({ card: findCard, message: "Query successful" });
       } catch (error) {
         return res.status(500).send({ error: error });
       }
     } else {
       return res
         .status(400)
-        .send("Bad Request. One or both query is not a string");
+        .send({ error: "Bad Request. One or both query is not a string" });
     }
   } else {
     return res
       .status(405)
-      .send({ Allow: "GET", reponse: `${req.method} method not supported` });
+      .send({ Allow: "GET", error: `${req.method} method not supported` });
   }
 };
 
-export default connectDB(getCard);
+export default mongoHandler(getCard);
