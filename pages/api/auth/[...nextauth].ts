@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import bcrypt from "bcrypt";
 import User from "../../../models/user";
+import { mongoConnect } from "./../../../middleware";
 import clientPromise from "../../../utility/mongodb";
 
 export default NextAuth({
@@ -18,6 +19,7 @@ export default NextAuth({
       async authorize(credentials) {
         try {
           //lookup DB email
+          mongoConnect();
           const getUser = await User.findOne(
             {
               email: credentials!.email,
