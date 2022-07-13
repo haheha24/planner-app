@@ -6,6 +6,7 @@ import { getProviders, getCsrfToken, signIn } from "next-auth/react";
 import type { LiteralUnion, ClientSafeProvider } from "next-auth/react";
 import type { BuiltInProviderType } from "next-auth/providers";
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { signInSchema } from "../../schemas/dbValidation";
 import { useUpdateThemeOnce } from "../../hooks/ThemeContext";
 import type { IUserTheme } from "../../hooks/ThemeContext";
@@ -35,6 +36,7 @@ export default function SignIn({
   const [credentialsError, setCredentialsError] = useState<
     string | undefined | null
   >(null);
+  const [passType, setPassType] = useState(false);
 
   const initialValues = {
     email: "",
@@ -94,11 +96,14 @@ export default function SignIn({
               <label htmlFor="password">Password</label>
               <Field
                 id="password"
-                type="password"
+                type={passType ? "text" : "password"}
                 name="password"
                 placeholder="Password"
                 autoComplete="current-password"
               />
+              <button onClick={() => setPassType(!passType)}>
+                {passType ? <AiFillEyeInvisible /> : <AiFillEye />}
+              </button>
             </div>
 
             <div>
