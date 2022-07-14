@@ -20,10 +20,10 @@ Installation:
 Extra setup:
 
 Create a `.env` file. It will require the following:
-GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET - https://www.youtube.com/watch?v=HtJKUQXmtok&ab_channel=CooperCodes the first 2 minutes explains exactly how to setup an OAuth2 client.
-NEXTAUTH_URL - When deploying to production, set the NEXTAUTH_URL environment variable to the canonical URL of your site.
-MONGODB_URI - The URI string that is provided once you have created a MongoDB Atlas cloud database.
-NEXT_PUBLIC_API_MOCKING - set as true or false to enable mocking api for `MSW`.
+- GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET - https://www.youtube.com/watch?v=HtJKUQXmtok&ab_channel=CooperCodes the first 2 minutes explains exactly how to setup an OAuth2 client.
+- NEXTAUTH_URL - When deploying to production, set the NEXTAUTH_URL environment variable to the canonical URL of your site.
+- MONGODB_URI - The URI string that is provided once you have created a MongoDB Atlas cloud database.
+- NEXT_PUBLIC_API_MOCKING - set as true or false to enable mocking api for `MSW`.
 
 To Run Test Suite:  
 
